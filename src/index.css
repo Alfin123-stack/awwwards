@@ -10,6 +10,12 @@ body {
 /* --- Font Import --- */
 @layer base {
   @font-face {
+    font-family: "zentry";
+    src: url("/fonts/zentry-regular.woff2") format("woff2");
+    font-display: swap;
+  }
+
+  @font-face {
     font-family: "circular-web";
     src: url("/fonts/circularweb-book.woff2") format("woff2");
     font-display: swap;
@@ -40,6 +46,7 @@ body {
   --font-general: "general", sans-serif;
   --font-robert-medium: "robert-medium", sans-serif;
   --font-robert-regular: "robert-regular", sans-serif;
+  --font-zentry: "zentry-regular", sans-serif;
 
   --color-blue-50: #dfdff0;
   --color-blue-75: #dfdff2;
