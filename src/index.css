@@ -7,6 +7,77 @@ body {
   overflow-x: hidden;
 }
 
+@keyframes equalize1 {
+  0% {
+    transform: scaleY(0.3);
+  }
+  25% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.5);
+  }
+  75% {
+    transform: scaleY(0.9);
+  }
+  100% {
+    transform: scaleY(0.3);
+  }
+}
+
+@keyframes equalize2 {
+  0% {
+    transform: scaleY(0.4);
+  }
+  25% {
+    transform: scaleY(0.8);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+  75% {
+    transform: scaleY(0.6);
+  }
+  100% {
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes equalize3 {
+  0% {
+    transform: scaleY(0.2);
+  }
+  25% {
+    transform: scaleY(0.9);
+  }
+  50% {
+    transform: scaleY(0.4);
+  }
+  75% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0.2);
+  }
+}
+
+/* connect animation names to utility classes */
+.animate-eq1 {
+  animation: equalize1 0.9s infinite ease-in-out;
+}
+
+.animate-eq2 {
+  animation: equalize2 0.9s infinite ease-in-out;
+}
+
+.animate-eq3 {
+  animation: equalize3 0.9s infinite ease-in-out;
+}
+
+span {
+  transform-origin: bottom; /* bar naik turun dari bawah */
+}
+
 /* --- Font Import --- */
 @layer base {
   @font-face {
