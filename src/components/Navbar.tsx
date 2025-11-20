@@ -4,16 +4,26 @@ import { Send, Play } from "lucide-react";
 import React, { useRef, useState, useEffect } from "react";
 import { useWindowScroll } from "react-use";
 import gsap from "gsap";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const navRef = useRef<HTMLDivElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [hasBg, setHasBg] = useState(false); // ← background toggle
+  const [hasBg, setHasBg] = useState(false);
 
   const { y } = useWindowScroll();
   const prevY = useRef(0);
+
+  // Daftar menu + route path
+  const navMenu = [
+    { label: "Nexus", path: "/nexus" },
+    { label: "Vault", path: "/vault" },
+    { label: "Prologue", path: "/prologue" },
+    { label: "About", path: "/about" },
+    { label: "Contact", path: "/contact" },
+  ];
 
   const toggleAudio = () => {
     if (!audioRef.current) return;
@@ -27,22 +37,18 @@ const Navbar = () => {
     }
   };
 
-  // --- Scroll Logic (background + floating nav)
+  // Scroll logic (hide/show navbar + background)
   useEffect(() => {
     if (!navRef.current) return;
 
     const currentY = y;
 
-    // ========== BG LOGIC ==========
-    if (currentY > 20) {
-      setHasBg(true); // scroll down → show bg
-    } else {
-      setHasBg(false); // at top → transparent
-    }
+    // Background toggle
+    if (currentY > 20) setHasBg(true);
+    else setHasBg(false);
 
-    // ========== FLOATING NAV LOGIC ==========
+    // Hide on scroll down
     if (currentY > prevY.current + 20) {
-      // scroll down → hide
       gsap.to(navRef.current, {
         y: -120,
         opacity: 0,
@@ -51,8 +57,8 @@ const Navbar = () => {
       });
     }
 
+    // Show on scroll up
     if (currentY < prevY.current - 20) {
-      // scroll up → show
       gsap.to(navRef.current, {
         y: 0,
         opacity: 1,
@@ -75,11 +81,13 @@ const Navbar = () => {
       `}>
       {/* Logo + Button */}
       <div className="flex items-center gap-6 md:gap-10">
-        <img
-          src="/img/logo.png"
-          className="w-10 h-10 object-contain"
-          alt="logo"
-        />
+        <Link to="/">
+          <img
+            src="/img/logo.png"
+            className="w-10 h-10 object-contain cursor-pointer"
+            alt="logo"
+          />
+        </Link>
 
         <button
           className="group flex items-center gap-2 cursor-pointer rounded-xl
@@ -95,15 +103,17 @@ const Navbar = () => {
       {/* Navigation */}
       <nav>
         <ul className="flex items-center gap-8 text-white font-general">
-          {["Nexus", "Vault", "Prologue", "About", "Contact"].map((item) => (
-            <li
-              key={item}
-              className="cursor-pointer transition-colors duration-300 hover:text-amber-400">
-              {item}
+          {navMenu.map((item) => (
+            <li key={item.label}>
+              <Link
+                to={item.path}
+                className="cursor-pointer transition-colors duration-300 hover:text-amber-400">
+                {item.label}
+              </Link>
             </li>
           ))}
 
-          {/* 🔊 Audio Button */}
+          {/* Audio Button */}
           <li>
             <button
               onClick={toggleAudio}
