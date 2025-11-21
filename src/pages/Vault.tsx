@@ -1,4 +1,3 @@
-// pages/vault.tsx
 "use client";
 
 import React, { useEffect, useRef } from "react";
@@ -32,34 +31,37 @@ const vaultItems = [
 ];
 
 export default function Vault() {
-  const containerRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const glyphsRef = useRef<HTMLElement[]>([]);
   const cardRefs = useRef<HTMLDivElement[]>([]);
+  const fxClusterRef = useRef<HTMLDivElement | null>(null);
   const bgRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Page fade in
-      gsap.from(".vault-page", {
+      // Fade sequence
+      gsap.from(".fade-in", {
         opacity: 0,
-        duration: 1.4,
+        y: 25,
+        duration: 1.25,
         ease: "power3.out",
+        stagger: 0.1,
       });
 
       // Floating glyphs
       glyphsRef.current.forEach((g, i) => {
         gsap.to(g, {
-          y: -10 - i * 2,
-          duration: 4 + i * 0.4,
+          y: -18 - i * 4,
+          duration: 3 + i * 0.4,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
         });
       });
 
-      // Background subtle scale/parallax
-      gsap.to(bgRef.current, {
-        scale: 1.12,
+      // Background Parallax scale
+      gsap.to(".vault-bg", {
+        scale: 1.18,
         ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
@@ -69,54 +71,59 @@ export default function Vault() {
         },
       });
 
-      // Cards enter reveal
+      // FX Cluster floating
+      gsap.to(".fx-dot", {
+        y: -35,
+        x: (i) => (Math.random() - 0.5) * 60,
+        duration: 4,
+        stagger: 0.03,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+
+      // Card reveal (Prologue-style)
       gsap.from(cardRefs.current, {
         opacity: 0,
         y: 40,
-        scale: 0.96,
+        rotateX: -25,
         duration: 1.2,
         ease: "power3.out",
-        stagger: 0.1,
+        stagger: 0.2,
         scrollTrigger: {
           trigger: ".vault-grid",
           start: "top 85%",
         },
       });
 
-      // Better GPU-tilt
+      // GPU Tilt 3D hover
       cardRefs.current.forEach((card) => {
-        const inner = card.querySelector<HTMLElement>(".vault-card-inner");
-        if (!inner) return;
+        const inner = card.querySelector(".vault-inner");
 
-        let raf: number | null = null;
-
-        const onMove = (e: MouseEvent) => {
+        card.addEventListener("mousemove", (e) => {
           const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width - 0.5;
-          const y = (e.clientY - r.top) / r.height - 0.5;
+          const x = e.clientX - r.left;
+          const y = e.clientY - r.top;
 
-          const rx = -y * 12;
-          const ry = x * 12;
+          const rx = (y / r.height - 0.5) * -16;
+          const ry = (x / r.width - 0.5) * 16;
 
-          if (raf) cancelAnimationFrame(raf);
-
-          raf = requestAnimationFrame(() => {
-            inner.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+          gsap.to(inner, {
+            rotateX: rx,
+            rotateY: ry,
+            duration: 0.35,
+            ease: "power3.out",
           });
-        };
+        });
 
-        const onLeave = () => {
-          if (raf) cancelAnimationFrame(raf);
+        card.addEventListener("mouseleave", () => {
           gsap.to(inner, {
             rotateX: 0,
             rotateY: 0,
             duration: 0.45,
             ease: "power3.out",
           });
-        };
-
-        card.addEventListener("mousemove", onMove);
-        card.addEventListener("mouseleave", onLeave);
+        });
       });
     }, containerRef);
 
@@ -126,7 +133,7 @@ export default function Vault() {
   return (
     <main
       ref={containerRef}
-      className="vault-page relative min-h-screen w-full text-white overflow-hidden bg-black font-robert-regular">
+      className="relative min-h-screen w-full bg-black text-white overflow-hidden font-robert-regular">
       {/* BACKGROUND VIDEO */}
       <video
         ref={bgRef}
@@ -134,97 +141,89 @@ export default function Vault() {
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-40">
+        className="vault-bg absolute inset-0 w-full h-full object-cover brightness-[0.35] contrast-[1.2]">
         <source src="/videos/hero-1.mp4" type="video/mp4" />
       </video>
 
-      {/* DARK OVERLAY */}
-      <div className="absolute inset-0 bg-black/70" />
-
-      {/* TEXTURE OVERLAY */}
+      {/* TEXTURE */}
       <div
-        className="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none -z-10"
-        style={{
-          backgroundImage:
-            "url('/mnt/data/222744f8-4cf8-4a8a-95a7-a2ab0a2585c5.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none"
+        style={{ backgroundImage: "url('/img/stones.webp')" }}
       />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05),rgba(0,0,0,0.9))]" />
 
-      {/* FLOATING GLYPHS */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 flex gap-6 opacity-40 pointer-events-none z-40">
-        {["✦", "𐌂", "✸", "𐌑"].map((g, i) => (
-          <span
+      {/* EMBER / FX CLUSTER */}
+      <div ref={fxClusterRef} className="absolute inset-0 pointer-events-none">
+        {[...Array(50)].map((_, i) => (
+          <div
             key={i}
-            ref={(el) => el && (glyphsRef.current[i] = el)}
-            className="font-zentry text-xl blur-[0.4px] select-none">
-            {g}
-          </span>
+            className="fx-dot absolute w-[4px] h-[4px] bg-white/40 rounded-full blur-[2px]"
+            style={{
+              top: `${20 + Math.random() * 70}%`,
+              left: `${10 + Math.random() * 80}%`,
+            }}
+          />
         ))}
       </div>
 
-      {/* HERO */}
-      <section className="relative z-30 container mx-auto px-6 pt-28 pb-12 text-center">
-        <p className="text-sm uppercase opacity-60 tracking-widest">
+      {/* HERO SECTION */}
+      <section className="relative z-20 text-center pt-40 pb-28 px-6 container mx-auto">
+        {/* Floating Glyphs */}
+        <div className="flex gap-6 justify-center mb-8">
+          {["✦", "𐌂", "✸", "𐌑", "✹"].map((g, i) => (
+            <span
+              key={i}
+              ref={(el) => (glyphsRef.current[i] = el!)}
+              className="fade-in font-zentry text-3xl opacity-60 select-none">
+              {g}
+            </span>
+          ))}
+        </div>
+
+        <p className="fade-in text-sm uppercase opacity-70 tracking-[0.3em]">
           The Archive
         </p>
 
-        <AnimatedTitle
-          title={"The <b>Vault</b> — curated relics"}
-          containerClass="mt-6 !text-white special-font"
-        />
+        <div className="fade-in mt-6">
+          <AnimatedTitle
+            title="The <b>Vault</b> — curated relics"
+            containerClass="!text-white text-5xl md:text-6xl font-zentry drop-shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+          />
+        </div>
 
-        <p className="mt-4 text-gray-300 max-w-2xl mx-auto">
+        <p className="fade-in mt-6 text-gray-300 text-lg max-w-2xl mx-auto">
           Explore curated assets, lore, and creations preserved across
           universes.
         </p>
       </section>
 
-      {/* GRID */}
-      <section className="relative z-30 container mx-auto px-6 pb-28">
-        <div className="vault-grid mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {/* GRID SECTION */}
+      <section className="relative z-20 container mx-auto px-6 pb-32">
+        <div className="vault-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
           {vaultItems.map((v, i) => (
             <div
               key={v.title}
               ref={(el) => el && (cardRefs.current[i] = el)}
-              className="relative group rounded-2xl overflow-hidden cursor-pointer transform-gpu">
-              <div className="vault-card-inner bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl shadow-xl transition-all duration-300">
-                {/* image */}
-                <div className="relative h-52 overflow-hidden">
+              className="pro-card relative group cursor-pointer perspective-[1200px]">
+              <div className="vault-inner bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl shadow-xl p-6 transition-all duration-300">
+                <div className="overflow-hidden rounded-xl mb-4">
                   <img
                     src={v.media}
-                    alt={v.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-all duration-700"
                   />
                 </div>
 
-                {/* text */}
-                <div className="p-5">
-                  <h3 className="font-zentry uppercase text-lg tracking-wide">
-                    {v.title}
-                  </h3>
-                  <p className="text-sm text-gray-300 mt-2">{v.subtitle}</p>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <button className="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm hover:bg-white/20 transition">
-                      View
-                    </button>
-                    <div className="text-xs text-gray-400">Details</div>
-                  </div>
-                </div>
+                <h3 className="text-xl font-robert-medium">{v.title}</h3>
+                <p className="text-gray-300 text-sm mt-2">{v.subtitle}</p>
               </div>
-
-              {/* rim light */}
-              <div className="pointer-events-none absolute inset-0 rounded-2xl border border-transparent group-hover:border-amber-300/25 transition-all duration-500" />
             </div>
           ))}
         </div>
       </section>
 
       {/* CTA */}
-      <div className="relative z-30 mb-24 text-center">
-        <button className="px-10 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl transition text-sm tracking-wide">
+      <div className="relative z-20 text-center pb-24">
+        <button className="px-12 py-4 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20 transition text-sm tracking-wide uppercase">
           Enter the Archive
         </button>
       </div>

@@ -21,41 +21,25 @@ export default function About() {
         ease: "power3.out",
       });
 
-      // FLOATING GLYPHS – softer, calmer
+      // FLOATING GLYPHS (unified with Prologue)
       glyphsRef.current.forEach((g, i) => {
         gsap.to(g, {
-          y: -10 - i * 4,
-          duration: 4 + i * 0.6,
+          y: -20 - i * 4,
+          duration: 3 + i * 0.4,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
         });
       });
 
-      // HERO TEXT REVEAL
-      gsap.from(".hero-sub", {
+      // HEADING FADE SEQUENCE
+      gsap.from(".head-fade", {
         opacity: 0,
-        y: 20,
-        duration: 1.4,
+        y: 25,
+        duration: 1.35,
         ease: "power3.out",
+        stagger: 0.15,
         delay: 0.2,
-      });
-
-      gsap.from(".hero-desc", {
-        opacity: 0,
-        y: 20,
-        duration: 1.4,
-        ease: "power3.out",
-        delay: 0.35,
-      });
-
-      // PORTAL CORE SCALE-IN
-      gsap.from(".origin-portal", {
-        opacity: 0,
-        scale: 0.6,
-        filter: "blur(40px)",
-        duration: 1.8,
-        ease: "power4.out",
       });
 
       // IMAGE MORPH SCROLL
@@ -102,13 +86,13 @@ export default function About() {
 
       <div className="absolute inset-0 bg-black/70" />
 
-      {/* FLOATING GLYPHS – refined */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 flex gap-6 opacity-40 pointer-events-none">
-        {["✦", "𐌂", "✸", "𐌑", "✹"].map((g, i) => (
+      {/* FLOATING GLYPHS – UNIFIED STYLE */}
+      <div className="absolute top-32 left-1/2 -translate-x-1/2 flex gap-8 opacity-50 pointer-events-none">
+        {["✦", "𐌂", "✸", "𐌑", "✹", "𐌙"].map((g, i) => (
           <span
             key={i}
             ref={(el) => (glyphsRef.current[i] = el)}
-            className="font-zentry text-xl tracking-wide blur-[0.5px]">
+            className="head-fade font-zentry text-3xl tracking-wide opacity-60 select-none">
             {g}
           </span>
         ))}
@@ -116,19 +100,24 @@ export default function About() {
 
       {/* HERO CONTENT */}
       <section className="relative z-20 text-center max-w-3xl mx-auto pt-48 px-6">
-        {/* Soft Glow Behind Title */}
+        {/* Glow Behind Title */}
         <div className="absolute inset-0 mx-auto max-w-xl blur-[120px] bg-white/5 -z-10"></div>
 
-        <p className="hero-sub text-sm uppercase tracking-[0.3em] opacity-50 font-general">
+        {/* SUBTITLE */}
+        <p className="head-fade text-sm uppercase tracking-[0.35em] opacity-70 font-general">
           Origin Chamber
         </p>
 
-        <AnimatedTitle
-          title={"Disc<b>o</b>ver the Origin — <b>Zentry</b>"}
-          containerClass="mt-6 !text-white special-font"
-        />
+        {/* TITLE */}
+        <div className="head-fade mt-6">
+          <AnimatedTitle
+            title={"Disc<b>o</b>ver the Origin — <b>Zentry</b>"}
+            containerClass="!text-white text-5xl md:text-6xl font-zentry special-font drop-shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+          />
+        </div>
 
-        <p className="hero-desc mt-6 text-gray-300 max-w-xl mx-auto text-lg leading-relaxed">
+        {/* DESCRIPTION */}
+        <p className="head-fade mt-6 text-gray-300 max-w-xl mx-auto text-lg leading-relaxed">
           The foundation of a meta-universe where worlds, identities, and
           experiences converge into a single evolving reality.
         </p>

@@ -3,38 +3,72 @@
 import React, { useEffect, useRef } from "react";
 import AnimatedTitle from "../components/AnimatedTitle";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Contact() {
   const containerRef = useRef(null);
   const glyphsRef = useRef([]);
+  const fxClusterRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // PAGE FADE
-      gsap.from(".page-fade", {
+      // Stagger Fade-in
+      gsap.from(".fade-in", {
         opacity: 0,
-        duration: 1.4,
+        y: 25,
+        duration: 1.25,
         ease: "power3.out",
+        stagger: 0.15,
+        delay: 0.2,
       });
 
-      // FLOATING GLYPHS - subtle
+      // Floating glyphs
       glyphsRef.current.forEach((g, i) => {
         gsap.to(g, {
-          y: -12 - i * 3,
-          duration: 4 + i * 0.5,
-          repeat: -1,
+          y: -18 - i * 4,
+          duration: 3 + i * 0.4,
           yoyo: true,
+          repeat: -1,
           ease: "sine.inOut",
         });
       });
 
-      // FORM REVEAL
+      // Background parallax
+      gsap.to(".bg-video", {
+        scale: 1.15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.25,
+        },
+      });
+
+      // Ember FX movement
+      gsap.to(".fx-dot", {
+        y: -40,
+        x: (i) => (Math.random() - 0.5) * 80,
+        duration: 4,
+        repeat: -1,
+        yoyo: true,
+        stagger: 0.03,
+        ease: "sine.inOut",
+      });
+
+      // Form cinematic reveal
       gsap.from(".form-block", {
         opacity: 0,
-        y: 30,
+        y: 40,
         duration: 1.2,
         ease: "power3.out",
-        delay: 0.6,
+        stagger: 0.2,
+        scrollTrigger: {
+          trigger: ".form-section",
+          start: "top 85%",
+        },
       });
     }, containerRef);
 
@@ -44,80 +78,101 @@ export default function Contact() {
   return (
     <main
       ref={containerRef}
-      className="page-fade relative min-h-screen bg-black text-white overflow-hidden">
-      {/* BACKGROUND VIDEO */}
+      className="relative min-h-screen w-full overflow-hidden bg-black text-white font-robert-regular">
+      {/* Background video */}
       <video
+        src="/videos/hero-3.mp4"
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-25">
-        <source src="/videos/hero-3.mp4" type="video/mp4" />
-      </video>
+        className="bg-video absolute inset-0 w-full h-full object-cover brightness-[0.35] contrast-[1.2]"
+      />
 
-      <div className="absolute inset-0 bg-black/70" />
+      {/* Texture layers */}
+      <div
+        className="absolute inset-0 opacity-[0.18] mix-blend-overlay pointer-events-none"
+        style={{ backgroundImage: "url('/img/stones.webp')" }}
+      />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),rgba(0,0,0,0.95))]" />
 
-      {/* FLOATING GLYPHS */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 flex gap-6 opacity-40 pointer-events-none">
-        {["✦", "𐌂", "✸", "𐌑", "✹"].map((g, i) => (
-          <span
+      {/* Ember FX */}
+      <div ref={fxClusterRef} className="absolute inset-0 pointer-events-none">
+        {[...Array(45)].map((_, i) => (
+          <div
             key={i}
-            ref={(el) => (glyphsRef.current[i] = el)}
-            className="font-zentry text-xl blur-[0.5px]">
-            {g}
-          </span>
+            className="fx-dot absolute w-[4px] h-[4px] bg-white/40 rounded-full blur-[2px]"
+            style={{
+              top: `${20 + Math.random() * 70}%`,
+              left: `${10 + Math.random() * 80}%`,
+            }}
+          />
         ))}
       </div>
 
-      {/* CONTACT SECTION */}
-      <section className="relative z-20 container mx-auto px-6 py-32 max-w-3xl text-center">
-        {/* Soft Glow Behind Header */}
-        <div className="absolute inset-0 mx-auto max-w-xl blur-[120px] bg-white/5 -z-10"></div>
+      {/* CONTENT */}
+      <section className="relative z-20 flex flex-col items-center pt-40 pb-32 px-6 text-center">
+        {/* Floating Glyph Row */}
+        <div className="flex gap-8 mb-10">
+          {["✦", "𐌂", "✸", "𐌑", "✹", "𐌙"].map((g, i) => (
+            <span
+              key={i}
+              ref={(el) => el && (glyphsRef.current[i] = el)}
+              className="fade-in font-zentry text-4xl tracking-wide opacity-60 select-none">
+              {g}
+            </span>
+          ))}
+        </div>
 
-        <p className="text-sm uppercase tracking-[0.25em] opacity-60 font-general">
-          Join Zentry
+        {/* Header */}
+        <p className="fade-in text-sm uppercase opacity-70 tracking-[0.35em] font-general">
+          Contact
         </p>
 
-        <AnimatedTitle
-          title={"let&#39;s b<b>u</b>ild the new era"}
-          containerClass="mt-6 !text-white special-font"
-        />
+        <div className="fade-in mt-6">
+          <AnimatedTitle
+            title="Let the <b>realms</b> reach back to you"
+            containerClass="!text-white text-5xl md:text-6xl font-zentry drop-shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+          />
+        </div>
 
-        <p className="mt-6 text-gray-400 max-w-xl mx-auto leading-relaxed">
-          Interested in collaboration, press, or partnerships? Reach out.
+        <p className="fade-in mt-6 text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto font-robert-regular">
+          Partnerships, alliances, inquiries — the gates are open.
         </p>
+      </section>
 
-        {/* FORM */}
-        <form className="form-block mt-12 grid gap-5 text-left">
-          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-5">
-            <input
-              type="text"
-              placeholder="Your name"
-              className="w-full bg-transparent outline-none text-white placeholder-gray-400"
-            />
-          </div>
+      {/* FORM SECTION */}
+      <section className="form-section relative z-30 px-6 pb-40 max-w-3xl mx-auto grid gap-8">
+        {/* Name */}
+        <div className="form-block backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
+          <input
+            type="text"
+            placeholder="Your name"
+            className="w-full bg-transparent outline-none text-white placeholder-gray-400"
+          />
+        </div>
 
-          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-5">
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full bg-transparent outline-none text-white placeholder-gray-400"
-            />
-          </div>
+        {/* Email */}
+        <div className="form-block backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full bg-transparent outline-none text-white placeholder-gray-400"
+          />
+        </div>
 
-          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-5 h-36">
-            <textarea
-              placeholder="Message"
-              className="w-full h-full bg-transparent outline-none resize-none text-white placeholder-gray-400"
-            />
-          </div>
+        {/* Message */}
+        <div className="form-block backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 h-40">
+          <textarea
+            placeholder="Message"
+            className="w-full h-full bg-transparent outline-none resize-none text-white placeholder-gray-400"
+          />
+        </div>
 
-          <div className="flex justify-center">
-            <button className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full backdrop-blur-xl transition font-robert-medium tracking-wide">
-              Contact us
-            </button>
-          </div>
-        </form>
+        {/* Submit */}
+        <button className="form-block mt-4 px-12 py-4 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-robert-medium hover:bg-white/20 transition-all duration-300 tracking-wide uppercase">
+          Send Message
+        </button>
       </section>
     </main>
   );
