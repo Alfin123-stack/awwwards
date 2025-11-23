@@ -1,8 +1,8 @@
-import About from "../components/About";
-import Features from "../components/Features";
-import Hero from "../components/Hero";
-import FloatingImage from "../components/Story";
-import Contact from "../components/Contact";
+import About from "../components/about/About";
+import Features from "../components/features/Features";
+import Hero from "../components/hero/Hero";
+import Contact from "../components/footer/Contact";
+import Story from "../components/story/Story";
 
 export default function Landing() {
   return (
@@ -10,7 +10,7 @@ export default function Landing() {
       <Hero />
       <About />
       <Features />
-      <FloatingImage />
+      <Story />
       <Contact />
     </>
   );

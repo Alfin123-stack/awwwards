@@ -5,12 +5,22 @@ import clsx from "clsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AnimatedTitle = ({ title, containerClass }) => {
-  const containerRef = useRef(null);
+type AnimatedTitleProps = {
+  title: string; // HTML string allowed
+  containerClass?: string;
+};
+
+const AnimatedTitle: React.FC<AnimatedTitleProps> = ({
+  title,
+  containerClass,
+}) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!containerRef.current) return;
+
     const ctx = gsap.context(() => {
-      const titleAnimation = gsap.timeline({
+      const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: "100 bottom",
@@ -19,7 +29,7 @@ const AnimatedTitle = ({ title, containerClass }) => {
         },
       });
 
-      titleAnimation.to(
+      timeline.to(
         ".animated-word",
         {
           opacity: 1,
@@ -31,7 +41,7 @@ const AnimatedTitle = ({ title, containerClass }) => {
       );
     }, containerRef);
 
-    return () => ctx.revert(); // Clean up on unmount
+    return () => ctx.revert();
   }, []);
 
   return (
