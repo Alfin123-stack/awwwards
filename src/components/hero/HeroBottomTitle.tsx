@@ -6,7 +6,7 @@ export default function HeroBottomTitle({ variant = "light" }) {
       className={`
         hero-heading 
         absolute 
-        bottom-4 right-2
+        bottom-4 right-4
 
         font-zentry
         special-font
