@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import NavbarAudioButton from "./NavbarAudioButton";
 import { navMenu } from "../../lib/data";
 
@@ -13,11 +13,14 @@ const NavbarMenuDesktop = ({ isPlaying, toggleAudio }: Props) => {
       <ul className="flex items-center gap-6 lg:gap-10 text-white font-general">
         {navMenu.map((item) => (
           <li key={item.label}>
-            <Link
+            <NavLink
               to={item.path}
-              className="cursor-pointer transition-colors duration-300 hover:text-amber-400">
+              className={({ isActive }) =>
+                `cursor-pointer transition-colors duration-300 
+                 ${isActive ? "text-amber-400" : "hover:text-amber-400"}`
+              }>
               {item.label}
-            </Link>
+            </NavLink>
           </li>
         ))}
 
